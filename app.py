@@ -81,7 +81,6 @@ def get_initial_dataFrames():
 @app.route('/')
 def index():
     res = get_initial_dataFrames()
-    print(res)
     return render_template('index.html',initial_data=res)
 
 

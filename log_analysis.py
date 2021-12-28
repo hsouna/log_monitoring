@@ -59,6 +59,7 @@ def graph_countries(ipDf=None):
 
 def main():
     with open('/var/log/apache2/wp.access.log', 'r') as f:
+        f.seek(0,2)
         event_handler = MyHandler(f)
         observer = Observer()
         observer.schedule(event_handler,  path='/var/log/apache2/wp.access.log',  recursive=False)
