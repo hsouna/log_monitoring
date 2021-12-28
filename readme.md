@@ -11,8 +11,15 @@ $ pip install -r requirements.txt
 ```
 
 ## Usage
+### run the flask application
 
 ```bash
 $ source ./venv/bin/activate
+$ python app.py
+```
+### run python deamon to watch changes
 
+```bash
+$ source ./venv/bin/activate
+$ python log_analysis.py
 ```

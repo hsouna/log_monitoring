@@ -94,7 +94,7 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
 
     # Add the arguments to the parser
-    ap.add_argument("--file_path", required=True,
+    ap.add_argument("--file_path", required=False,
     help="Input file path")
 
     args = vars(ap.parse_args())
