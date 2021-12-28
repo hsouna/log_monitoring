@@ -1,0 +1,108 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log analytics</title>
+</head>
+
+<body>
+    <h1>This is a monitoring solution</h1>
+
+
+    <div id="myChart" style="width: 60%;margin: auto;">
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"
+        integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA=="
+        crossorigin="anonymous"></script>
+    <script src="../static/js/main.js"></script>
+
+    <script>
+        var randomColorPlugin = {
+            // We affect the `beforeUpdate` event
+            start: function (chart) {
+                var backgroundColor = [];
+                var borderColor = [];
+
+                // For every data we have ...
+                for (var i = 0; i < chart.config.data.datasets[0].data.length; i++) {
+
+                    // We generate a random color
+                    var color = "rgba(" + Math.floor(Math.random() * 255) + "," + Math.floor(Math.random() *
+                        255) + "," + Math.floor(Math.random() * 255) + ",";
+
+                    // We push this new color to both background and border color arrays
+                    backgroundColor.push(color + "0.6)");
+                    borderColor.push(color + "1)");
+                }
+
+                // We update the chart bars color properties
+                chart.config.data.datasets[0].backgroundColor = backgroundColor;
+                chart.config.data.datasets[0].borderColor = borderColor;
+            }
+        };
+        init_graphs = {{ initial_data | safe }}
+        let charts = []
+        console.log(init_graphs)
+        let i = 0
+        for (const key in init_graphs) {
+            //document.getElementById('myChart').innerHTML += "<canvas id=c" + i + "></canvas>";
+            console.log(init_graphs[key]['y'])
+            let labels = init_graphs[key]['x']
+            let data = {
+                labels: labels,
+                datasets: [{
+                    label: init_graphs[key]['title'],
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    data: init_graphs[key]['y'],
+                }]
+            };
+            let config = {
+                type: 'bar',
+                data: data,
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    },
+                    indexAxis: key == 'ressource' ? 'y' : 'x' 
+                },
+                plugins: [randomColorPlugin]
+            };
+            var canvas = document.createElement('canvas'),
+                chartId = key;
+            canvas.id = chartId;
+            document.getElementById('myChart').appendChild(canvas);
+            var context = document.getElementById(chartId).getContext('2d');
+            window[chartId]  = new Chart(
+                context,
+                config
+            );
+            i++
+        }
+        for (const key in init_graphs) {
+            socket.on(key, function (json) {
+                if(init_graphs[key]['x'].includes(json[key])){
+                    let index = init_graphs[key]['x'].indexOf(json[key])
+                    init_graphs[key]['y'][index] += 1
+                    window[key].update()
+                    console.log(json)
+                }else{
+                    init_graphs[key]['x'].push(json[key])
+                    init_graphs[key]['y'].push(1)
+                    window[key].update()
+
+                }
+                
+            });
+        }
+        
+    </script>
+</body>
+
+</html>
